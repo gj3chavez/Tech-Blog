@@ -1,5 +1,4 @@
-const  commentFormHandler = async (event) => {
-
+async function commetformHandler(event) {
     event.preventDefault();
     
      const  comment_text = document.querySelector('#comment-body').value.trim();
@@ -16,7 +15,7 @@ const  commentFormHandler = async (event) => {
         });
     
          if  (response.ok) {
-        document.location.replace('/dashboard');
+        document.location.reload();
         }  else  {
         alert('Failed to create comment');
         document.querySelector('#comment-body').style.display = 'block';
@@ -24,10 +23,9 @@ const  commentFormHandler = async (event) => {
     }
     };
 
-document
-    .querySelector('.comment-form')
-    .addEventListener('submit', commentFormHandler);
+    document.querySelector('.comment-form').addEventListener('submit', commetformHandler);
 
 
 
-// Path: public/js/dashboard.js
+
+

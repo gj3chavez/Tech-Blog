@@ -1,4 +1,4 @@
-const { Blog } = require('../seeds');
+const { Blog } = require('../models');
 const sequelize = require('../config/connection');
 
 const blogData = [

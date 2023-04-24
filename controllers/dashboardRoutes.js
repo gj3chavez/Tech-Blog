@@ -2,6 +2,7 @@ const router = require('express').Router();
 const sequelize = require('../config/connection');
 const { Blog, User, Comment } = require('../models');
 
+const withAuth = require('../utils/auth');
 
 router.get('/', async (req, res) => {
   console.log(req.session);
@@ -28,8 +29,8 @@ router.get('/', async (req, res) => {
       }
     ]
   })
-  .then(dbBlogData => {
-    const blogs = dbBlogData.map(blog => blog.get({ plain: true }));
+  .then(blogData => {
+    const blogs = blogData.map(blog => blog.get({ plain: true }));
     res.render('homepage', { blogs, loggedIn: req.session.loggedIn });
   })
   .catch(err => {
@@ -39,20 +40,7 @@ router.get('/', async (req, res) => {
 });
 
 
-router.get('/login', async (req, res) => {
-  if (req.session.loggedIn) {
-    res.redirect('/');
-    return;
-  }
-
-  res.render('login');
-});
-
-router.get('/signup', async (req, res) => {
-  res.render('signup');
-});
-
-router.get('/blog/:id', async (req, res) => {
+router.get('/edit/:id', async (req, res) => {
   Blog.findOne({
     where: {
       id: req.params.id
@@ -85,7 +73,7 @@ router.get('/blog/:id', async (req, res) => {
     }
 
     const blog = blogData.get({ plain: true });
-    console.log(blog);
+
     res.render('single-blog', { blog, loggedIn: req.session.loggedIn });
   })
   .catch(err => {
@@ -93,50 +81,13 @@ router.get('/blog/:id', async (req, res) => {
 
     res.status(500).json(err);
   });
+})
+
+router.get('/new',(req, res) => {
+  res.render('add-blog');
+
 });
 
-
-router.get('/login', async (req, res) => {
-  Blog.findAll({
-    attributes: [
-      'id',
-      'title',
-      'content',
-      'created_at'
-    ],
-    include: [
-      {
-        model: Comment,
-        attributes: ['id', 'comment_text', 'blog_id', 'user_id', 'created_at'],
-        include: {
-          model: User,
-          attributes: ['username']
-        }
-      },
-      {
-        model: User,
-        attributes: ['username']
-      }
-    ]
-  })
-  .then(dbBlogData => {
-    const blogs = dbBlogData.map(blog => blog.get({ plain: true }));
-    res.render('blog', { blogs, loggedIn: req.session.loggedIn });
-  })
-  .catch(err => {
-    console.log(err);
-    res.status(500).json(err);
-  });
-});
-
-router.get('/signup', async (req, res) => {
-  if (req.session.loggedIn) {
-    res.redirect('/');
-    return;
-  }
-
-  res.render('signup');
-});
 
 
 

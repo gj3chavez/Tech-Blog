@@ -1,0 +1,26 @@
+<a href="/dashboard" class="go-back"> &lAarr;Back to dashboard</a>
+<br>
+<br>
+
+{{ post.title }}
+
+{{#if loggedIn}}
+<form class="comments-form">
+    <div>
+        <textarea name="comments"></textarea>
+    </div>
+    <div>
+        <button type="submit">Add Comment</button>
+    </div>
+</form>
+
+{{/if}}
+
+{{#each comments}}
+{{#if loggedIn}}
+<script src="/public/js/comment.js"></script>
+{{/if}}
+
+
+
+

@@ -1,105 +1,124 @@
 const router = require('express').Router();
 const { Blog, User, Comment } = require('../../models');
+const withAuth = require('../../utils/auth');
+const sequelize = require('../../config/connection');
 
 
-router.post('/create',  async (req, res) => {
+router.get("/", (req, res) => {
+  Blog.findAll({
+    attributes: ["id", "title", "content", "created_at"],
+    order: [["created_at", "DESC"]],
+    include: [{
+      model: User,
+      attributes: ['username']
+  },
+  {
+    model: Comment,
+    attributes: ['id', 'comment_text', 'user_id', 'post_id', 'created_at'],
+    include: {
+      model: User,
+      attributes: ['username']
+    }
+  }
+  ]
+  })
+    .then((blogData) => res.json(blogData))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+  });
 
-    const userData = req.session.User
-    try {
-      const BlogPost = await Blog.create({
+
+  router.get("/", (req, res) => {
+    Blog.findOne({
+      attributes: ["id", "title", "content", "created_at"],
+      order: [["created_at", "DESC"]],
+      include: [{
+        model: User,
+        attributes: ['username']
+    },
+    {
+      model: Comment,
+      attributes: ['id', 'comment_text', 'user_id', 'post_id', 'created_at'],
+      include: {
+        model: User,
+        attributes: ['username']
+      }
+    }
+    ]
+    })
+      .then((blogData) =>{
+        if (!blogData) {
+          res.status(404).json({ message: 'No blog found with this id' });
+          return;
+        }
+        res.json(blogData);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+    });
+
+    router.post("/", withAuth, (req, res) => {
+      Blog.create({
         title: req.body.title,
         content: req.body.content,
-        user_id: userData.id,
-      });
-      res.status(200).json(BlogPost);
-    } catch (err) {
-      res.status(400).json(err);
-    }
-  });
-
-router.post('/comment', async (req, res) => {
-  const userData = req.session.User
-  try {
-    const userId = userData.id
-    const CommentPost = await Comment.create({
-      comment: req.body.comment,
-      user_id: userId,
-      blog_id: req.body.blog_id,
+        user_id: req.session.user_id,
+      })
+        .then((blogData) => res.json(blogData))
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json(err);
+        });
     });
-    res.status(200).json(CommentPost);
-  } catch (err) {
-    res.status(400).json(err);
-  }
-});
 
-router.get('/id', async (req, res) => {
-  const userData = req.session.User
-  try {
-    const blogData = await Blog.findByPk(req.params.id, {
-      include: [
+    router.put("/:id", withAuth, (req, res) => {
+      Blog.update(
         {
-          model: User,
-          attributes: ['id', 'username'],
+          title: req.body.title,
+          content: req.body.content,
         },
         {
-          model: Comment,
-          attributes: ['id', 'comment', 'user_id', 'blog_id'],
-          include: {
-            model: User,
-            attributes: ['username'],
+          where: {
+            id: req.params.id,
           },
+        }
+      )
+        .then((blogData) => {
+          if (!blogData) {
+            res.status(404).json({ message: "No blog found with this id" });
+            return;
+          }
+          res.json(blogData);
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json(err);
+        });
+      });
+  
+    router.delete("/:id", withAuth, (req, res) => {
+      Blog.destroy({
+        where: {
+          id: req.params.id,
         },
-      ],
-    });
-    if (!blogData) {
-      res.status(404).json({ message: 'No blog found with this id!' });
-      return;
-    }
-    res.status(200).json(blogData);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-router.get('/', async (req, res) => {
-  const allBlog = await Blog.findAll({
-    include: [
-      {
-        model: User,
-        attributes: ['id', 'username'],
-      },
-      {
-        model: Comment,
-        attributes: ['id', 'comment', 'user_id', 'blog_id'],
-        include: {
-          model: User,
-          attributes: ['username'],
-        },
-      },
-    ],
-  });
-  res.status(200).json(allBlog);
-});
-
-
-router.delete('/delete', async (req, res) => {
-  try {
-    const projectBlog = await Blog.destroy({
-      where: {
-        id: req.params.id,
-      },
+      })
+        .then((blogData) => {
+          if (!blogData) {
+            res.status(404).json({ message: "No blog found with this id" });
+            return;
+          }
+          res.json(blogData);
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json(err);
+        });
     });
 
-    if (!projectBlog) {
-      res.status(404).json({ message: 'No blog found with this id!' });
-      return;
-    }
-
-    res.status(200).json(projectBlog);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+  
 
 
 module.exports = router;

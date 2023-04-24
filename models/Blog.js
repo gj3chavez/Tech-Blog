@@ -14,11 +14,14 @@ Blog.init(
     title: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: { len: [1] },
     },
     content: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
+      validate: {
+        len: [1],
+      }
     },
     user_id: {
       type: DataTypes.INTEGER,
@@ -30,7 +33,6 @@ Blog.init(
   },
   {
     sequelize,
-    timestamps: true,
     freezeTableName: true,
     underscored: true,
     modelName: 'blog',

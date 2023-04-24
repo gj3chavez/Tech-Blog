@@ -9,28 +9,31 @@ User.hasMany(Blog, {
 
 Blog.belongsTo(User, {
   foreignKey: 'user_id',
-  onDelete: 'CASCADE'
 });
 
-User.hasMany(Post, {
+Comment.belongsTo(User, {
   foreignKey: 'user_id',
-  onDelete: 'CASCADE'
+  onDelete: 'CASCADE',
+  hooks: true
 });
 
-Post.belongsTo(User, {
-  foreignKey: 'user_id',
-  onDelete: 'CASCADE'
-});
-
-Blog.hasMany(Post, { 
+Comment.belongsTo(Blog, {
   foreignKey: 'blog_id',
   onDelete: 'CASCADE'
 });
 
-Post.belongsTo(Blog, {
+User.hasMany(Comment, {
+  foreignKey: 'user_id',
+  onDelete: 'CASCADE',
+  hooks: true
+});
+
+Blog.hasMany(Comment, { 
   foreignKey: 'blog_id',
   onDelete: 'CASCADE'
 });
 
 
-module.exports = { User,Blog, Post };
+
+
+module.exports = { User,Blog, Comment};
