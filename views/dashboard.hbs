@@ -1,28 +1,27 @@
-<section class="new-post">
-    <button type="submit" class="btn" id="new_post">+ Creat new post</button>
+<section class="new-post-section">
+    <button type="submit" class="btn" id="create-new-post">+ Create new post</button>
 </section>
+
 
 {{#if posts.length}}
 <section>
-    <h2>Dashboard</h2>
-    <u class="posts">
+    <h2>Your Dashboard</h2>
+    <ul class="post-list">
         {{#each posts as |post|}}
-            <li class="post">
-                <a href="/post/{{post._id}}">{{post.title}}</a>
-                <button type="submit" class="btn" id="delete_post">Delete</button>
-            </li>
+        <li>
+            {{> post-info post}}
+            <a href="/dashboard/edit/{{post.id}}" class="edit-link">edit post</a>
+        </li>
         {{/each}}
-    </u>
+    </ul>
 </section>
-{{else}}
-    <p>No posts yet</p>
 {{/if}}
 
-<script src="/public/js/create-post.js"></script>
+<script src="/js/create-post.js"></script>
 
 
 
 
 
 
-{{! Path: views/post.handlebars }}
+

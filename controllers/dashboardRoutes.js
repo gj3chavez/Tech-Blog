@@ -1,13 +1,16 @@
 const router = require('express').Router();
 const sequelize = require('../config/connection');
-const { Blog, User, Comment } = require('../models');
+const { Post, User, Comment } = require('../models');
 
 const withAuth = require('../utils/auth');
 
-router.get('/', async (req, res) => {
-  console.log(req.session);
+router.get('/', withAuth, (req, res) => {
 
-  Blog.findAll({
+
+  Post.findAll({
+    where: {
+      user_id: req.session.user_id
+    },
     attributes: [
       'id', 
       'title',
@@ -16,7 +19,7 @@ router.get('/', async (req, res) => {
     include: [
       {
         model: Comment,
-        attributes: ['id', 'user_id', 'comment_text', 'blog_id', 'created_at'],
+        attributes: ['id', 'user_id', 'comment_text', 'post_id', 'created_at'],
         include: {
         model: User,
         attributes: ['username']
@@ -29,9 +32,9 @@ router.get('/', async (req, res) => {
       }
     ]
   })
-  .then(blogData => {
-    const blogs = blogData.map(blog => blog.get({ plain: true }));
-    res.render('homepage', { blogs, loggedIn: req.session.loggedIn });
+  .then(dbPostData => {
+    const posts = dbPostData.map(post => post.get({ plain: true }));
+    res.render('dashboard', { posts, loggedIn:true });
   })
   .catch(err => {
     console.log(err);
@@ -40,8 +43,8 @@ router.get('/', async (req, res) => {
 });
 
 
-router.get('/edit/:id', async (req, res) => {
-  Blog.findOne({
+router.get('/edit/:id', withAuth, (req, res) => {
+  Post.findOne({
     where: {
       id: req.params.id
     },
@@ -54,27 +57,27 @@ router.get('/edit/:id', async (req, res) => {
     include: [
       {
         model: Comment,
-        attributes: ['id', 'comment_text', 'blog_id', 'user_id', 'created_at'],
+        attriPutes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
         include: {
           model: User,
-          attributes: ['username']
+          attriPutes: ['username']
         }
       },
       {
         model: User,
-        attributes: ['username']
+        attriPutes: ['username']
       }
     ]
   })
-  .then(blogData => {
-    if (!blogData) {
-      res.status(404).json({ message: 'No blog found with this id' });
+  .then(dbPostData => {
+    if (!dbPostData) {
+      res.status(404).json({ message: 'No post found with this id' });
       return;
     }
 
-    const blog = blogData.get({ plain: true });
+    const post = dbPostData.get({ plain: true });
 
-    res.render('single-blog', { blog, loggedIn: req.session.loggedIn });
+    res.render('edit-post', { post, loggedIn: true });
   })
   .catch(err => {
     console.log(err);
@@ -84,7 +87,9 @@ router.get('/edit/:id', async (req, res) => {
 })
 
 router.get('/new',(req, res) => {
-  res.render('add-blog');
+  res.render('add-post', {
+    loggedIn: true
+  });
 
 });
 

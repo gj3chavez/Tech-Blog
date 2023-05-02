@@ -1,6 +1,7 @@
-
-<article class="homepage">
-  {{#each posts as |post|}}
-   {{homepage-detail post}}
-  {{/each}}
-</article>
+<ul class="post-list">
+    {{#each posts as |post|}}
+    <li>
+        {{> post-info post }}
+    </li>
+    {{/each}}
+</ul>

@@ -1,8 +1,7 @@
 async function loginFormHandler(event){
   event.preventDefault();
 
-  // Collect values from the login form
-  // const email = document.querySelector('#email-login').value.trim();
+  const email = document.querySelector('#email-login').value.trim();
   const username = document.querySelector('#username-login').value.trim();
   const password = document.querySelector('#password-login').value.trim();
 
@@ -10,7 +9,7 @@ async function loginFormHandler(event){
     // Send a POST request to the API endpoint
     const response = await fetch('/api/users/login', {
       method: 'POST',
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email, username, password }),
       headers: { 'Content-Type': 'application/json' },
     });
 
@@ -23,33 +22,33 @@ async function loginFormHandler(event){
   }
 };
 
-async function signupFormHandler (event){
-  event.preventDefault();
+// async function signupFormHandler (event){
+//   event.preventDefault();
 
-  const username = document.querySelector('#username-signup').value.trim();
-  // const email = document.querySelector('#email-signup').value.trim();
-  const password = document.querySelector('#password-signup').value.trim();
+//   const username = document.querySelector('#username-signup').value.trim();
 
-  if (username && password) {
-    const response = await fetch('/api/users', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-      headers: { 'Content-Type': 'application/json' },
-    });
+//   const password = document.querySelector('#password-signup').value.trim();
 
-    if (response.ok) {
-      console.log('success');
-      document.location.replace('/dashboard');
-    } else {
-      alert(response.statusText);
-    }
-  }
-};
+//   if (username && password) {
+//     const response = await fetch('/api/users', {
+//       method: 'POST',
+//       body: JSON.stringify({ username, password }),
+//       headers: { 'Content-Type': 'application/json' },
+//     });
 
-document
-  .querySelector('.login-form')
-  .addEventListener('submit', loginFormHandler);
+//     if (response.ok) {
+//       console.log('success');
+//       document.location.replace('/dashboard');
+//     } else {
+//       alert(response.statusText);
+//     }
+//   }
+// };
 
-document
-  .querySelector('.signup-form')
-  .addEventListener('submit', signupFormHandler);
+// document
+//   .querySelector('.login-form')
+//   .addEventListener('submit', loginFormHandler);
+
+// document
+//   .querySelector('.signup-form')
+//   .addEventListener('submit', signupFormHandler);

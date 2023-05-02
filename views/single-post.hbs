@@ -1,26 +1,23 @@
-<a href="/dashboard" class="go-back"> &lAarr;Back to dashboard</a>
+<a href="/dashboard" class="go-back"> &larr; Back to dashboard</a>
 <br>
 <br>
 
-{{ post.title }}
+{{> post-info post}}
 
 {{#if loggedIn}}
-<form class="comments-form">
+<form class="comment-form">
     <div>
-        <textarea name="comments"></textarea>
+        <textarea name="comment-body"></textarea>
     </div>
+
     <div>
-        <button type="submit">Add Comment</button>
+        <button type="submit">add comment</button>
     </div>
 </form>
-
 {{/if}}
 
-{{#each comments}}
+{{> comments post.comments}}
+
 {{#if loggedIn}}
-<script src="/public/js/comment.js"></script>
+<script src="/js/comment.js"></script>
 {{/if}}
-
-
-
-

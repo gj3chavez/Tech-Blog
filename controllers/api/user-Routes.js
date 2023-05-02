@@ -1,12 +1,12 @@
 const router = require('express').Router();
-const { User, Blog, Comment } = require('../../models');
+const { User, Post, Comment } = require('../../models');
 
 router.get('/', (req, res) => {
    User.findAll({
       attributes: { exclude: ['password'] }
     })
 
-    .then((userData) => res.json(userData))
+    .then((dbUserData) => res.json(dbUserData))
     .catch((err) => {
       console.log(err);
       res.status(500).json(err);
@@ -21,30 +21,30 @@ router.get('/:id',(req, res) => {
     },
     include: [
       {
-        model: Blog,
+        model: Post,
         attributes: ['id', 'title', 'content', 'created_at'],
       },
       {
         model: Comment,
         attributes: ['id', 'comment_text', 'created_at'],
         include: {
-          model: Blog,
+          model: Post,
           attributes: ['title'],
         },
       },
       {
-        model: Blog,
+        model: Post,
         attributes: ['title'],
       },
     ],
   })
 
-  .then((userData) => {
-    if (!userData) {
+  .then((dbUserData) => {
+    if (!dbUserData) {
       res.status(404).json({ message: 'No user found with this id' });
       return;
     }
-    res.json(userData);
+    res.json(dbUserData);
   })
   .catch((err) => {
     console.log(err);
@@ -52,14 +52,14 @@ router.get('/:id',(req, res) => {
   });
 });
 
-router.post('/', async (req, res) => {
+router.post('/', (req, res) => {
       User.create({ username: req.body.username,
-        password: req.body.password,
+        password: req.body.password, email: req.body.email
        })
-      .then((userData) => {
+      .then((dbUserData) => {
         req.session.save(() => {
-          req.session.user_id = userData.id;
-          req.session.username = userData.username;
+          req.session.user_id = dbUserData.id;
+          req.session.username = dbUserData.username;
           req.session.loggedIn = true;
 
           res.json(dbUserData);
@@ -77,28 +77,41 @@ router.post('/login', (req, res) => {
     where: {
       username: req.body.username,
     },
-  }).then((userData) => {
-    if (!userData) {
+  }).then((dbUserData) => {
+    if (!dbUserData) {
       res.status(400).json({ message: 'No user with that email address!' });
       return;
     }
 
-    const validPassword = userData.checkPassword(req.body.password);
-
-    if (!validPassword) {
-      res.status(400).json({ message: 'Incorrect password!' });
-      return;
-    }
-
     req.session.save(() => {
-      req.session.user_id = userData.id;
-      req.session.username = userData.username;
+      req.session.user_id = dbUserData.id;
+      req.session.username = dbUserData.username;
       req.session.loggedIn = true;
 
-      res.json({ user: userData, message: 'You are now logged in!' });
+      res.json({ user: dbUserData, message: 'You are now logged in!' });
     });
   });
+
+  const validPassword = dbUserData.checkPassword(req.body.password);
+
+  if (!validPassword) {
+    res.status(400).json({ message: 'Incorrect password!' });
+    return;
+  }
+
+
+req.session.save(() => {
+  req.session.user_id = dbUserData.id;
+  req.session.username = dbUserData.username;
+  req.session.loggedIn = true;
+
+  res.json({
+      user: dbUserData,
+      message: 'You are now logged in!'
+  });
 });
+});
+
 
 router.post('/logout', (req, res) => {
   if (req.session.loggedIn) {

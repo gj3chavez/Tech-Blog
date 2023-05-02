@@ -1,12 +1,11 @@
 const router = require('express').Router();
 const sequelize = require('../config/connection');
-const { Blog, User, Comment } = require('../models');
+const { Post, User, Comment } = require('../models');
 
 
 router.get('/', async (req, res) => {
-  console.log(req.session);
 
-  Blog.findAll({
+  Post.findAll({
     attributes: [
       'id', 
       'title',
@@ -15,7 +14,7 @@ router.get('/', async (req, res) => {
     include: [
       {
         model: Comment,
-        attributes: ['id', 'user_id', 'comment_text', 'blog_id', 'created_at'],
+        attributes: ['id', 'user_id', 'comment_text', 'post_id', 'created_at'],
         include: {
         model: User,
         attributes: ['username']
@@ -28,9 +27,9 @@ router.get('/', async (req, res) => {
       }
     ]
   })
-  .then(dbBlogData => {
-    const blogs = dbBlogData.map(blog => blog.get({ plain: true }));
-    res.render('homepage', { blogs, loggedIn: req.session.loggedIn });
+  .then(dbPostData => {
+    const Posts = dbPostData.map(Post => Post.get({ plain: true }));
+    res.render('homepage', { posts, loggedIn: req.session.loggedIn });
   })
   .catch(err => {
     console.log(err);
@@ -39,21 +38,8 @@ router.get('/', async (req, res) => {
 });
 
 
-router.get('/login', async (req, res) => {
-  if (req.session.loggedIn) {
-    res.redirect('/');
-    return;
-  }
-
-  res.render('login');
-});
-
-router.get('/signup', async (req, res) => {
-  res.render('signup');
-});
-
-router.get('/blog/:id', async (req, res) => {
-  Blog.findOne({
+router.get('/post/:id', async (req, res) => {
+  Post.findOne({
     where: {
       id: req.params.id
     },
@@ -66,7 +52,7 @@ router.get('/blog/:id', async (req, res) => {
     include: [
       {
         model: Comment,
-        attributes: ['id', 'comment_text', 'blog_id', 'user_id', 'created_at'],
+        attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
         include: {
           model: User,
           attributes: ['username']
@@ -78,15 +64,15 @@ router.get('/blog/:id', async (req, res) => {
       }
     ]
   })
-  .then(blogData => {
-    if (!blogData) {
-      res.status(404).json({ message: 'No blog found with this id' });
+  .then(PostData => {
+    if (!PostData) {
+      res.status(404).json({ message: 'No Post found with this id' });
       return;
     }
 
-    const blog = blogData.get({ plain: true });
-    console.log(blog);
-    res.render('single-blog', { blog, loggedIn: req.session.loggedIn });
+    const post = PostData.get({ plain: true });
+   
+    res.render('single-post', { post, loggedIn: req.session.loggedIn });
   })
   .catch(err => {
     console.log(err);
@@ -96,48 +82,27 @@ router.get('/blog/:id', async (req, res) => {
 });
 
 
-router.get('/login', async (req, res) => {
-  Blog.findAll({
-    attributes: [
-      'id',
-      'title',
-      'content',
-      'created_at'
-    ],
-    include: [
-      {
-        model: Comment,
-        attributes: ['id', 'comment_text', 'blog_id', 'user_id', 'created_at'],
-        include: {
-          model: User,
-          attributes: ['username']
-        }
-      },
-      {
-        model: User,
-        attributes: ['username']
-      }
-    ]
-  })
-  .then(dbBlogData => {
-    const blogs = dbBlogData.map(blog => blog.get({ plain: true }));
-    res.render('blog', { blogs, loggedIn: req.session.loggedIn });
-  })
-  .catch(err => {
-    console.log(err);
-    res.status(500).json(err);
-  });
-});
 
-router.get('/signup', async (req, res) => {
+router.get('/login',(req, res) => {
   if (req.session.loggedIn) {
-    res.redirect('/');
-    return;
+      res.redirect('/');
+      return;
   }
 
-  res.render('signup');
+  res.render('login');
 });
 
+router.get('/signup', (req, res) => {
+  if (req.session.loggedIn) {
+      res.redirect('/');
+      return;
+  }
+  res .render('signup');
+});
+
+router.get('*', (req, res) => {
+  res.status(404).send('404 Error!');
+});
 
 
 module.exports = router;
