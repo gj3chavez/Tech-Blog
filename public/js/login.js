@@ -20,7 +20,9 @@ async function loginFormHandler(event){
       alert(response.statusText);
     }
   }
-};
+}
+
+document.querySelector('.login-form').addEventListener('submit', loginFormHandler);
 
 // async function signupFormHandler (event){
 //   event.preventDefault();

@@ -1,58 +1,49 @@
-const { Model, DataTypes } = require('sequelize');
-const bcrypt = require('bcrypt');
-const sequelize = require('../config/connection');
+// import all models
+const Post = require('./Post');
+const User = require('./User');
+const Comment = require('./Comment');
 
-class User extends Model {
-  checkPassword(loginPw) {
-    return bcrypt.compareSync(loginPw, this.password);
-  }
-}
+// Create associations between the models
+// User-Post relationship
+User.hasMany(Post, {
+    foreignKey: 'user_id'
+});
+//Post-User relationship
+Post.belongsTo(User, {
+    foreignKey: 'user_id'
+});
 
-User.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true,
-      },
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        len: [6],
-      },
-    },
-  },
-  {
-    hooks: {
-      async beforeCreate(newUserData) {
-        newUserData.password = await bcrypt.hash(newUserData.password, 10);
-        return newUserData;
-      },
-      async beforeUpdate(updatedUserData){
-        updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
-        return updatedUserData;
-      },
-    },
-    sequelize,
-    timestamps: false,
-    freezeTableName: true,
-    underscored: true,
-    modelName: 'user',
-  }
-);
+// Comment-User relationship
+Comment.belongsTo(User, {
+    foreignKey: 'user_id',
+    onDelete: 'cascade',
+    hooks: true
+});
 
-module.exports = User;
+// Comment-Post relationship
+Comment.belongsTo(Post, {
+    foreignKey: 'post_id',
+    onDelete: 'cascade',
+    hooks: true
+});
+
+// User-Comment relationship
+User.hasMany(Comment, {
+    foreignKey: 'user_id',
+    onDelete: 'cascade',
+    hooks: true
+});
+
+// Post-Comment relationship
+Post.hasMany(Comment, {
+    foreignKey: 'post_id',
+    onDelete: 'cascade',
+    hooks: true
+})
+
+// Export the modules
+module.exports = {
+    User,
+    Post,
+    Comment
+};
