@@ -4,11 +4,20 @@
 
 # Description
 This project is a CMS-style blog where developers can publish their blog posts and comment on other developers post. This application follows the MVC paradigm in it's structure and uses Handlebars.js as the templating language, Sequelize as the ORM, and the express-session npm package for authentication.
+This application was created using Node.js, express for the server, and sequelize to connect to a mysql database entitled "myblog_db". All user, post, and comment data is stored in myblog_db. The live app is currently deployed on Heroku, using the JAWSDB add on to store data. All passwords have been encrypted using the bcrypt Node.js package. The views templates are generated using Handlebars.js.
 
-## Aplication Preview
-The following animation shows the app functionality.
-![Tech-blog]()
+Heroku link: https://boiling-ridge-48805.herokuapp.com/
 
+## Screenshots
+
+
+|    Sign Up Page   |     Create Post    |
+|-------------------|--------------------|
+![Tech-blog](/public/assets/Blog1.png)|![Tech-blog](/public/assets/Blog3.png)|
+
+|    Post created     |Update or Delet Post|
+|---------------------|--------------------|
+![Tech-blog](/public/assets/Blog4.png)|![Tech-blog](/public/assets/Blog5.png)|
 
 ## Techonologies
 
