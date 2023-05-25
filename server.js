@@ -1,57 +1,44 @@
-
-
-
-
-// Dependencies
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const exphbs = require('express-handlebars');
-
-const routes = require('./controllers/');
+const routes = require('./controllers');
 const helpers = require('./utils/helpers');
+
+const sequelize = require('./config/connection');
+
+// Create a new sequelize store using the express-session package
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const sequelize = require("./config/connection");
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
+
+// Configure and link a session object with the sequelize store
 const sess = {
-    secret: process.env.DB_SESSION_SECRET,
-    cookie: {
-        // maxAge:
-    },
-    resave: false,
-    saveUninitialized: true,
-    store: new SequelizeStore({
-        db: sequelize
-    })
+  secret: process.env.DB_SESSION_SECRET,
+  cookie: {},
+  resave: false,
+  saveUninitialized: true,
+  store: new SequelizeStore({
+    db: sequelize
+  })
 };
 
+// Add express-session and store as Express.js middleware
 app.use(session(sess));
-const hbs = exphbs.create({
-    helpers
-});
-app.engine('handlebars', hbs.engine);
+const hbs = exphbs.create({ helpers });
 
-//app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
 app.use(express.json());
-app.use(express.urlencoded
-    ({
-        extended: false
-    }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-//path to the routes
+
 app.use(routes);
 
-sequelize.sync({
-    force: false
-}).then(() => {
-    app.listen(PORT, () => {
-        console.log(`App listening on port ${PORT}!`);
-    }
-    )
+sequelize.sync({ force: false }).then(() => {
+  app.listen(PORT, () => console.log('Now listening'));
 });

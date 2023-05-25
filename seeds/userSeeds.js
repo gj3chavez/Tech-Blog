@@ -5,28 +5,28 @@ const bcrypt = require('bcrypt');
 const userData = [
     {
         username: 'Miranda_Moore',
-        email: 'miranda_moore@gmail.com',
-        password: 'password123'
+        email: 'miranda_moore@test.com',
+        password: 'test'
     },
     {
         username: 'Giuliana_Chavez',
-        email: 'giuliana_r@gmail.com',
-        password: 'password123'
+        email: 'giuliana_r@test.com',
+        password: 'test'
     },
     {
         username: 'Giuliana_Chavez',
-        email: 'giuliana_r@gmail.com',
-        password: 'password123'
+        email: 'giuliana_r@test.com',
+        password: 'test'
     },
     {
         username: 'Giuliana_Chavez',
-        email: 'giuliana_r@gmail.com',
-        password: 'password123'
+        email: 'giuliana_r@test.com',
+        password: 'test'
     },
     {
         username: 'Giuliana_Chavez',
-        email: 'giuliana_r@gmail.com',
-        password: 'password123'
+        email: 'giuliana_r@test.com',
+        password: 'test'
     },
 
 ];
